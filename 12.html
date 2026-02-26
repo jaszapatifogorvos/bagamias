@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prémium Betegirányító - Jászapáti Fogászat</title>
+    <style>
+        :root {
+            --bg-main: #f4f7f6;
+            --bg-panel: #ffffff;
+            --text-main: #1d1d1f;
+            --text-muted: #86868b;
+            --border-color: #d2d2d7;
+            --btn-primary: #0071e3;
+            --btn-primary-hover: #0077ed;
+            --btn-secondary: #f5f5f7;
+            --shadow: 0 4px 20px rgba(0,0,0,0.1);
+            --status-bg-1: #e8f2ff;
+            --status-text-1: #0071e3;
+            --status-bg-2: #fff2ed;
+            --status-text-2: #d95e16;
+        }
+
+        body, html {
+            margin: 0; padding: 0; height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Arial, sans-serif;
+            background-color: var(--bg-main); color: var(--text-main);
+            overflow: hidden;
+        }
+
+        /* Felső Vezérlősáv - MEGNÖVELT MAGASSÁG A NAGYOBB LOGÓ MIATT */
+        .vezerlo-sav {
+            background-color: var(--bg-panel); padding: 12px 30px;
+            box-shadow: var(--shadow); display: flex; align-items: center; justify-content: space-between;
+            height: 95px; /* 75px-ről 95px-re növelve */
+            z-index: 1000; position: relative; box-sizing: border-box;
+        }
+
+        /* LOGÓ STÍLUSA - MEGNÖVELT MÉRET */
+        .cim-resz {
+            display: flex; align-items: center; justify-content: flex-start;
+        }
+        .fejlec-logo {
+            height: 95px; /* 55px-ről 70px-re növelve, sokkal feltűnőbb lesz! */
+            width: auto;
+            object-fit: contain;
+        }
+
+        .vezerlok { display: flex; align-items: center; gap: 10px; flex-grow: 1; max-width: 650px; margin: 0 30px; }
+
+        .vezerlok select, .vezerlok input[type="number"], .vezerlok button {
+            box-sizing: border-box; height: 46px; padding: 0 15px;
+            font-size: 15px; border-radius: 10px; outline: none; transition: 0.2s ease-in-out; font-family: inherit;
+        }
+
+        .vezerlok select, .vezerlok input[type="number"] {
+            border: 1px solid var(--border-color); background-color: var(--bg-main); color: var(--text-main);
+        }
+        
+        .vezerlok select { flex-grow: 1; cursor: pointer; font-weight: 500; }
+        .vezerlok input[type="number"] { width: 100px; display: none; text-align: center; }
+        .vezerlok select:focus, .vezerlok input[type="number"]:focus { border-color: var(--btn-primary); box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.2); }
+
+        .vezerlok button { border: none; cursor: pointer; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-kell { background-color: var(--btn-primary); color: #fff; }
+        .btn-kell:hover { background-color: var(--btn-primary-hover); }
+
+        .jobb-sarok { display: flex; align-items: center; gap: 15px; }
+
+        .naptar-beallitas { 
+            display: flex; flex-direction: column; align-items: flex-end; justify-content: center;
+            margin-right: 20px; padding-right: 20px; border-right: 1px solid var(--border-color);
+        }
+        .naptar-beallitas label { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.5px; }
+        .naptar-beallitas select {
+            border: 1px solid var(--border-color); background-color: var(--bg-main); color: var(--text-main);
+            border-radius: 6px; padding: 5px 10px; font-size: 14px; font-weight: 500; outline: none; cursor: pointer; font-family: inherit;
+        }
+        .naptar-beallitas select:focus { border-color: var(--btn-primary); }
+
+        .ido-kijelzo {
+            display: flex; flex-direction: column; align-items: flex-end; justify-content: center;
+        }
+        .ido-kijelzo .ora { font-size: 19px; font-weight: 600; color: var(--text-main); letter-spacing: 0.5px; }
+        .ido-kijelzo .datum { font-size: 13px; font-weight: 500; color: var(--text-muted); margin-top: 2px; }
+
+        /* Naptár tároló - hozzáigazítva a 95px-es menühöz */
+        .naptar-tarolo {
+            height: calc(100% - 95px); width: 100%; position: relative; background-color: #fff;
+        }
+        .naptar-tarolo iframe { width: 100%; height: 100%; border: none; }
+
+        /* LEBEGŐ ABLAK (Modal) STÍLUSAI */
+        .modal-hatter {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(6px);
+            z-index: 2000; display: none; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.3s ease;
+        }
+        
+        .modal-hatter.lathato { display: flex; opacity: 1; }
+
+        .modal-tartalom {
+            width: 90%; max-width: 1100px; height: 85%;
+            background-color: var(--bg-panel); border-radius: 16px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            display: flex; flex-direction: column; overflow: hidden;
+            transform: scale(0.95); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .modal-hatter.lathato .modal-tartalom { transform: scale(1); }
+
+        .modal-fejlec {
+            background-color: var(--bg-main); padding: 15px 25px;
+            border-bottom: 1px solid var(--border-color); display: flex;
+            justify-content: space-between; align-items: center;
+        }
+        
+        .modal-cím { display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 600; color: var(--text-main); }
+        .korzet-jelzo { padding: 4px 12px; border-radius: 20px; font-size: 14px; font-weight: bold; }
+        .jelzo-1 { background-color: var(--status-bg-1); color: var(--status-text-1); }
+        .jelzo-2 { background-color: var(--status-bg-2); color: var(--status-text-2); }
+
+        .bezar-gomb {
+            background-color: #ff3b30; color: white; border: none; padding: 8px 16px;
+            border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer;
+            transition: 0.2s; display: flex; align-items: center; gap: 6px;
+        }
+        .bezar-gomb:hover { background-color: #d70015; }
+
+        .modal-iframe-tarolo { flex: 1; width: 100%; background-color: #fff; }
+        .modal-iframe-tarolo iframe { width: 100%; height: 100%; border: none; }
+
+    </style>
+</head>
+<body>
+
+    <div class="vezerlo-sav">
+        <div class="cim-resz">
+            <img src="logo.png" alt="Rendelői Logó" class="fejlec-logo">
+        </div>
+
+        <div class="vezerlok">
+            <select id="utcaValaszto" onchange="utcaValtozott()">
+                <option value="">-- Kérem válassza ki a beteg utcáját! --</option>
+            </select>
+            <input type="number" id="hazszam" placeholder="Házszám" min="1">
+            <button class="btn-kell" onclick="naptarBetoltese()">Foglalás Indítása ⏎</button>
+        </div>
+
+        <div class="jobb-sarok">
+            <div class="naptar-beallitas">
+                <label>Háttér Naptár</label>
+                <select id="fixNaptarValaszto" onchange="jobbNaptarFrissites()">
+                    <option value="1">I. Körzet (Csaba)</option>
+                    <option value="2">II. Körzet (Kata)</option>
+                </select>
+            </div>
+
+            <div class="ido-kijelzo" id="idoKijelzo">
+                <span class="ora" id="pontosIdo">--:--:--</span>
+                <span class="datum" id="pontosDatum">----. --. --.</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="naptar-tarolo">
+        <iframe id="jobbNaptarIframe" src=""></iframe>
+    </div>
+
+    <div class="modal-hatter" id="foglalasModal">
+        <div class="modal-tartalom">
+            <div class="modal-fejlec">
+                <div class="modal-cím">
+                    <span>Időpont rögzítése:</span>
+                    <span id="modalUtcaKiiras" style="font-weight: normal; margin-right: 10px;"></span>
+                    <span id="modalKorzetJelzo" class="korzet-jelzo"></span>
+                </div>
+                <button class="bezar-gomb" onclick="bezarModal()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    Bezárás
+                </button>
+            </div>
+            <div class="modal-iframe-tarolo">
+                <iframe id="modalIframe" src=""></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // FOGLALÁSI OLDAL LINKEK
+        const orvos1Foglalolink = "https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ33_dOoB25zF0iL4Pc73e2WKdozTIp-WZdIsL0T24jynfX_FSKOBzlcbvMj4JdUkXRUE8IhHw-K";
+        const orvos2Foglalolink = "https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ0C-TewK3hvCQndFFdoKo0RPuyMBgsf6Uodjp8K0G-TJiyqNh7S9egQv9HHxbtoL7JqGnA8kCAm";
+
+        // ÉLŐ NAPTÁR ALAPLINKEK
+        const orvos1NaptarAlap = "https://calendar.google.com/calendar/embed?src=csabarendelo%40gmail.com&ctz=Europe%2FBudapest&showTitle=0&showPrint=0&showCalendars=0&showTz=0";
+        const orvos2NaptarAlap = "https://calendar.google.com/calendar/embed?src=katarendelo%40gmail.com&ctz=Europe%2FBudapest&showTitle=0&showPrint=0&showCalendars=0&showTz=0";
+
+        const korzet1Tiszta = [ "Ady Endre utca", "Akácfa utca", "Álmos utca", "Alsónyomás tanya", "Antal utca", "Aradi utca", "Árpád Vezér utca", "Balassi Bálint utca", "Bartók Béla utca", "Béke utca", "Bem Apó utca", "Bercsényi utca", "Busai utca", "Csaba vezér utca", "Csajági utca", "Csátés tanya 2.", "Csintó utca", "Damjanich út", "Dankó Pista utca", "Dobó utca", "Dósa utca", "Esze Tamás utca", "Farkas utca", "Felsőnyomás tanya", "Felvégi utca", "Gábor Áron utca", "Galamb utca", "Gazda-farm 1.", "Gyeplegelő tanya", "Hét-vezért utca", "Hold utca", "Ilona utca", "István Major", "Jásziványi út", "Jászkapitány utca", "Jókai utca", "Kazinczy utca", "Kinizsi utca", "Kisfaludy utca", "Kocsér utca", "Kossuth Lajos út", "Mező utca", "Munkácsy tér", "Munkás utca", "Nap utca", "Nyúl utca", "Orgona utca", "Pélyi út", "Rákóczi utca", "Rapi utca", "Rózsa utca", "Sas utca", "Simon Ignác utca", "Somogyi Béla utca", "Sóti utca", "Szigligeti utca", "Szikszai Gábor utca", "Szögvégi utca", "Szűcs utca", "Tabáni utca", "Temető utca", "Tó utca", "Tompa Mihály utca", "Tóth utca", "Uj utca", "Vágó Pál utca", "Városkert utca", "Vasút utca", "Vasvári utca", "Viola utca", "Winkler István utca", "Zenész utca", "Jászivány - Akácfa utca", "Jászivány - Köves út", "Jászivány - Fő út", "Jászivány - Rózsa utca", "Jászivány - Kossuth utca" ];
+        const korzet2Tiszta = [ "Alkotmány utca", "Arany János utca", "Árvai utca", "Attila utca", "Balla utca", "Beöthy István utca", "Berdó utca", "Berente utca", "Bethlen Gábor utca", "Bocskai utca", "Bódi utca", "Budai utca", "Csátés tanyák", "Diófa utca", "Dózsa György utca", "Dr. Szlovencsák Imre út", "Erdei utca", "Erkel Ferenc út", "Farkas tanyák", "Fasor utca", "Fekete utca", "Fürdő utca", "Fürj utca", "Fűzfa utca", "Gojsza utca", "Gyöngyvirág utca", "Győri utca", "Hársfa utca", "Holló utca", "Honvéd utca", "Hősök tere", "Hunyadi utca", "Huszár utca", "Ibolya utca", "István király park", "Ivanics utca", "Jászkun utca", "Jázmin utca", "Juhász Máté utca", "Kálmán utca", "Kard utca", "Kaszásrét tanya", "Kikelet utca", "Király tanya", "Koczka utca", "Kolozsvári utca", "Léhi utca", "Liliom utca", "Liszt Ferenc utca", "Litkey Máté tér", "Lóczi utca", "Losonczi utca", "Madách utca", "Mag utca", "Magyar utca", "Makkos tanya", "Makó utca", "Malom utca", "Margaréta utca", "Mókus utca", "Nagyszék tanya", "Napsugár utca", "Nefelejcs utca", "Nyár utca", "Nyárfás utca", "Nyil utca", "Nyírfa utca", "Nyitrai utca", "Pacsirta utca", "Pajzs utca", "Palotási János utca", "Parajos tanya", "Parkerdő utca", "Rezeda utca", "Róka utca", "Rozmaring utca", "Rusvai utca", "Simonyi óbester utca", "Síp utca", "Sólyom utca", "Sport utca", "Szabadság utca", "Szegfű utca", "Táncsics út", "Tanya tanya 069/4", "Tél utca", "Temesvári utca", "Tulipán utca", "Tüzér utca", "Utassi utca", "Vince utca", "Vörösmarty utca", "Zrínyi utca", "Jászivány - Alkotmány utca", "Jászivány - Szabadság utca", "Jászivány - Jász utca", "Jászivány - Turul utca", "Jászivány - Petőfi utca" ];
+
+        const megosztottUtcak = {
+            "Balajti Illésné utca": (szam) => { return (szam % 2 !== 0) ? (szam <= 17 ? 1 : 2) : (szam <= 12 ? 1 : 2); },
+            "Borbás utca": (szam) => { return (szam % 2 !== 0) ? (szam <= 9 ? 1 : 2) : (szam <= 26 ? 1 : 2); },
+            "István király út": (szam) => { return (szam % 2 !== 0) ? 1 : (szam >= 26 ? 1 : 2); },
+            "József Attila utca": (szam) => { return (szam % 2 !== 0) ? (szam >= 15 ? 1 : 2) : (szam >= 10 ? 1 : 2); },
+            "Kisjárási utca": (szam) => { return (szam % 2 !== 0) ? (szam <= 19 ? 1 : 2) : (szam <= 50 ? 1 : 2); },
+            "Korona utca": (szam) => { return (szam <= 20 ? 1 : 2); },
+            "Lados utca": (szam) => { return (szam % 2 !== 0) ? (szam <= 33 ? 1 : 2) : (szam <= 24 ? 1 : 2); },
+            "Lehel utca": (szam) => { return (szam % 2 === 0) ? 1 : (szam <= 11 ? 1 : 2); },
+            "Petőfi Sándor út": (szam) => { return (szam % 2 === 0) ? (szam <= 20 ? 1 : 2) : 2; },
+            "Széchényi utca": (szam) => { return (szam % 2 === 0) ? 1 : 2; },
+            "Szőlő utca": (szam) => { return (szam % 2 !== 0) ? (szam >= 39 ? 1 : 2) : (szam >= 36 ? 1 : 2); }
+        };
+
+        let osszesUtca = [];
+        korzet1Tiszta.forEach(u => osszesUtca.push({ nev: u, tipus: "1" }));
+        korzet2Tiszta.forEach(u => osszesUtca.push({ nev: u, tipus: "2" }));
+        Object.keys(megosztottUtcak).forEach(u => osszesUtca.push({ nev: u, tipus: "okos" }));
+        osszesUtca.sort((a, b) => a.nev.localeCompare(b.nev, 'hu'));
+
+        function idoFrissites() {
+            const most = new Date();
+            const napok = ['Vasárnap', 'Hétfő', 'Kedd', 'Szerda', 'Csütörtök', 'Péntek', 'Szombat'];
+            const honapok = ['jan.', 'febr.', 'márc.', 'ápr.', 'máj.', 'jún.', 'júl.', 'aug.', 'szept.', 'okt.', 'nov.', 'dec.'];
+            document.getElementById('pontosIdo').innerText = `${String(most.getHours()).padStart(2, '0')}:${String(most.getMinutes()).padStart(2, '0')}:${String(most.getSeconds()).padStart(2, '0')}`;
+            document.getElementById('pontosDatum').innerText = `${most.getFullYear()}. ${honapok[most.getMonth()]} ${String(most.getDate()).padStart(2, '0')}., ${napok[most.getDay()]}`;
+        }
+
+        window.onload = function() {
+            const selectElem = document.getElementById("utcaValaszto");
+            osszesUtca.forEach(utca => {
+                let option = document.createElement("option");
+                option.value = utca.tipus; option.dataset.utcanev = utca.nev; option.text = utca.nev;
+                selectElem.appendChild(option);
+            });
+            
+            jobbNaptarFrissites();
+            setInterval(idoFrissites, 1000); idoFrissites();
+        };
+
+        document.addEventListener('keydown', function(event) { if (event.key === 'Enter') naptarBetoltese(); });
+
+        function utcaValtozott() {
+            const valasztottTipus = document.getElementById("utcaValaszto").value;
+            const hazszamMezo = document.getElementById("hazszam");
+
+            if (valasztottTipus === "okos") {
+                hazszamMezo.style.display = "inline-block"; hazszamMezo.value = ""; hazszamMezo.focus();
+            } else { hazszamMezo.style.display = "none"; }
+        }
+
+        function jobbNaptarFrissites() {
+            const fixNaptarErtek = document.getElementById("fixNaptarValaszto").value;
+            const alapUrl = (fixNaptarErtek === "1") ? orvos1NaptarAlap : orvos2NaptarAlap;
+            document.getElementById("jobbNaptarIframe").src = alapUrl + "&mode=WEEK";
+        }
+
+        function bezarModal() {
+            document.getElementById("foglalasModal").classList.remove("lathato");
+            setTimeout(() => { document.getElementById("modalIframe").src = ""; }, 300); 
+            
+            document.getElementById("utcaValaszto").value = "";
+            document.getElementById("hazszam").value = "";
+            document.getElementById("hazszam").style.display = "none";
+            document.getElementById("utcaValaszto").focus();
+            
+            jobbNaptarFrissites(); 
+        }
+
+        function naptarBetoltese() {
+            const selectElem = document.getElementById("utcaValaszto");
+            const valasztottTipus = selectElem.value;
+            const utcanev = valasztottTipus ? selectElem.options[selectElem.selectedIndex].dataset.utcanev : "";
+            const hazszam = document.getElementById("hazszam").value;
+            
+            if (valasztottTipus === "") { alert("Kérem, válasszon egy utcát a listából!"); return; }
+
+            let vegsoKorzet = 0;
+            if (valasztottTipus === "1") vegsoKorzet = 1;
+            if (valasztottTipus === "2") vegsoKorzet = 2;
+            if (valasztottTipus === "okos") {
+                if (hazszam === "") { alert("Ehhez az utcához kötelező megadni a házszámot!"); document.getElementById("hazszam").focus(); return; }
+                vegsoKorzet = megosztottUtcak[utcanev](parseInt(hazszam, 10));
+            }
+
+            const modalUtcaKiiras = document.getElementById("modalUtcaKiiras");
+            const modalKorzetJelzo = document.getElementById("modalKorzetJelzo");
+            const modalIframe = document.getElementById("modalIframe");
+
+            modalUtcaKiiras.innerText = `${utcanev} ${hazszam ? hazszam+'.' : ''}`;
+
+            if (vegsoKorzet === 1) {
+                modalKorzetJelzo.innerText = "I. számú körzet";
+                modalKorzetJelzo.className = "korzet-jelzo jelzo-1";
+                modalIframe.src = orvos1Foglalolink;
+            } else if (vegsoKorzet === 2) {
+                modalKorzetJelzo.innerText = "II. számú körzet";
+                modalKorzetJelzo.className = "korzet-jelzo jelzo-2";
+                modalIframe.src = orvos2Foglalolink;
+            }
+
+            document.getElementById("foglalasModal").classList.add("lathato");
+        }
+    </script>
+</body>
+</html>
