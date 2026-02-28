@@ -35,6 +35,7 @@
             height: 95px; z-index: 1000; position: relative; box-sizing: border-box;
         }
 
+        /* LOGÓ ÉS KÉZI GOMBOK */
         .cim-resz {
             display: flex; align-items: center; justify-content: flex-start;
         }
@@ -61,6 +62,7 @@
             transform: translateY(-1px);
         }
 
+        /* UTCAVÁLASZTÓ RÉSZ */
         .vezerlok { display: flex; align-items: center; gap: 10px; flex-grow: 1; max-width: 650px; margin: 0 30px; }
 
         .vezerlok select, .vezerlok input[type="number"], .vezerlok button {
@@ -80,6 +82,7 @@
         .btn-kell { background-color: var(--btn-primary); color: #fff; }
         .btn-kell:hover { background-color: var(--btn-primary-hover); }
 
+        /* JOBB SAROK RÉSZ */
         .jobb-sarok { display: flex; align-items: center; gap: 12px; }
 
         .btn-sarok { 
@@ -118,10 +121,10 @@
         }
         .naptar-tarolo iframe { width: 100%; height: 100%; border: none; }
 
-        /* --- ÚJ: ÜDVÖZLŐKÉPERNYŐ (APPLE GLASS STÍLUS) --- */
+        /* --- ÜDVÖZLŐKÉPERNYŐ (APPLE GLASS STÍLUS) KÖRZETVÁLASZTÓVAL --- */
         .udvozlo-hatter {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(255, 255, 255, 0.3);
+            background-color: rgba(255, 255, 255, 0.4);
             backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
             z-index: 3000; display: flex; align-items: center; justify-content: center;
             opacity: 1; transition: opacity 0.5s ease, visibility 0.5s;
@@ -132,9 +135,9 @@
         }
 
         .udvozlo-doboz {
-            background: rgba(255, 255, 255, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            border-radius: 24px; padding: 45px 40px; max-width: 500px;
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 24px; padding: 40px; max-width: 550px; width: 90%;
             box-shadow: 0 25px 50px rgba(0,0,0,0.15), inset 0 0 0 1px rgba(255,255,255,0.5);
             text-align: center;
             transform: translateY(0) scale(1);
@@ -143,25 +146,37 @@
         
         .udvozlo-hatter.rejtett .udvozlo-doboz { transform: translateY(20px) scale(0.95); }
 
-        .udvozlo-ikon { font-size: 50px; margin-bottom: 15px; display: inline-block; }
-        .udvozlo-doboz h2 { font-size: 26px; color: var(--text-main); margin: 0 0 10px 0; letter-spacing: -0.5px; }
-        .udvozlo-doboz p { color: var(--text-muted); font-size: 15px; margin: 0 0 25px 0; }
+        .udvozlo-ikon { font-size: 45px; margin-bottom: 10px; display: inline-block; }
+        .udvozlo-doboz h2 { font-size: 24px; color: var(--text-main); margin: 0 0 8px 0; letter-spacing: -0.5px; }
+        .udvozlo-doboz p { color: var(--text-muted); font-size: 15px; margin: 0 0 20px 0; }
         
-        .udvozlo-lista { text-align: left; list-style: none; padding: 0; margin: 0 0 35px 0; }
+        .udvozlo-lista { text-align: left; list-style: none; padding: 0; margin: 0 0 30px 0; }
         .udvozlo-lista li { 
-            margin-bottom: 12px; font-size: 14.5px; color: var(--text-main); 
+            margin-bottom: 10px; font-size: 14px; color: var(--text-main); 
             display: flex; align-items: center; gap: 15px; line-height: 1.4; 
             background: var(--bg-main); padding: 12px 18px; border-radius: 12px;
         }
         .udvozlo-lista li span { font-size: 20px; }
         
-        .btn-kezdes {
-            background-color: var(--btn-primary); color: white; border: none; padding: 16px 30px;
-            font-size: 16px; font-weight: 600; border-radius: 12px; cursor: pointer; width: 100%;
-            transition: all 0.2s; box-shadow: 0 4px 12px rgba(0, 113, 227, 0.3);
+        /* Körzetválasztó gombok a nyitóképernyőn */
+        .udvozlo-kerdes {
+            font-size: 16px; color: var(--text-main); font-weight: 600; margin-bottom: 15px;
         }
-        .btn-kezdes:hover { background-color: var(--btn-primary-hover); transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0, 113, 227, 0.4); }
-        .btn-kezdes:active { transform: translateY(0); }
+        .udvozlo-gombok {
+            display: flex; gap: 15px; justify-content: center;
+        }
+        .btn-valaszto {
+            flex: 1; padding: 18px 10px; background-color: var(--bg-main); border: 2px solid transparent;
+            border-radius: 14px; font-size: 16px; font-weight: 600; color: var(--text-main);
+            cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+            display: flex; flex-direction: column; align-items: center; gap: 8px;
+        }
+        .btn-valaszto span { font-size: 24px; }
+        .btn-valaszto:hover {
+            border-color: var(--btn-primary); background-color: #fff; transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 113, 227, 0.15); color: var(--btn-primary);
+        }
+        .btn-valaszto:active { transform: translateY(0); }
 
         /* LEBEGŐ ABLAK FOGLALÁSHOZ */
         .modal-hatter {
@@ -205,18 +220,26 @@
 
     <div id="udvozloKepernyo" class="udvozlo-hatter rejtett">
         <div class="udvozlo-doboz">
-            <span class="udvozlo-ikon">👋</span>
-            <h2>Rendelői Műszerfal</h2>
-            <p>Rövid összefoglaló az új okosfunkciókról:</p>
+            <span class="udvozlo-ikon" id="udvozloIkon">👋</span>
+            <h2 id="udvozloSzoveg">Üdvözlöm!</h2>
+            <p>Rövid emlékeztető az okosfunkciókhoz:</p>
             
             <ul class="udvozlo-lista">
-                <li><span>🪟</span> <div><b>Teljes képernyő:</b> Kattintson a bal felső fog logóra, hogy a program kitöltse a képernyőt!</div></li>
-                <li><span>➕</span> <div><b>Kézi foglalás (Kivétel):</b> A logó melletti kis gombokkal utca kiválasztása nélkül is adhat időpontot.</div></li>
-                <li><span>✉️</span> <div><b>Röntgen / E-mail:</b> A jobb felső gombbal egy új lapon azonnal megnyílik a kiválasztott orvos e-mail fiókja.</div></li>
-                <li><span>🧠</span> <div><b>Okos utcák:</b> A megosztott utcáknál (pl. Borbás) a gép automatikusan bekéri a házszámot a besoroláshoz.</div></li>
+                <li><span>🪟</span> <div><b>Teljes képernyő:</b> Kattintson a bal felső fog logóra a nagyításhoz!</div></li>
+                <li><span>➕</span> <div><b>Kézi foglalás:</b> A logó melletti gombokkal utca megadása nélkül is foglalhat.</div></li>
+                <li><span>✉️</span> <div><b>E-mail:</b> A jobb felső gomb új lapon megnyitja a kiválasztott orvos Gmail fiókját.</div></li>
             </ul>
 
-            <button class="btn-kezdes" onclick="bezarUdvozlo()">Munkamenet megkezdése</button>
+            <div class="udvozlo-kerdes">Kérem, válassza ki, kinek a naptárát szeretné látni:</div>
+            
+            <div class="udvozlo-gombok">
+                <button class="btn-valaszto" onclick="munkamenetInditas('1')">
+                    <span>👨‍⚕️</span> I. Körzet (Csaba)
+                </button>
+                <button class="btn-valaszto" onclick="munkamenetInditas('2')">
+                    <span>👩‍⚕️</span> II. Körzet (Kata)
+                </button>
+            </div>
         </div>
     </div>
 
@@ -281,21 +304,42 @@
     </div>
 
     <script>
-        // --- ÜDVÖZLŐKÉPERNYŐ LOGIKA ---
-        // Csak akkor mutatja, ha ebben a böngészési munkamenetben még nem látták
+        // --- ÜDVÖZLŐKÉPERNYŐ LOGIKA + OKOS NAPSZAK FIGYELÉS ---
         window.addEventListener('DOMContentLoaded', () => {
+            
+            // Óra lekérdezése az üdvözléshez
+            const ora = new Date().getHours();
+            const udvozloSzoveg = document.getElementById('udvozloSzoveg');
+            const udvozloIkon = document.getElementById('udvozloIkon');
+
+            if (ora < 11) {
+                udvozloSzoveg.innerText = "Jó reggelt!";
+                udvozloIkon.innerText = "☀️";
+            } else if (ora < 18) {
+                udvozloSzoveg.innerText = "Jó munkát!";
+                udvozloIkon.innerText = "☕";
+            } else {
+                udvozloSzoveg.innerText = "Szép estét!";
+                udvozloIkon.innerText = "🌙";
+            }
+
+            // Csak akkor mutatja, ha ma még nem volt megnyitva a böngészőfülön
             if (!sessionStorage.getItem('udvozloLatva')) {
-                // Kis késleltetés a szép betöltéshez
                 setTimeout(() => {
                     document.getElementById('udvozloKepernyo').classList.remove('rejtett');
                 }, 300);
+            } else {
+                jobbNaptarFrissites();
             }
         });
 
-        function bezarUdvozlo() {
+        function munkamenetInditas(orvosId) {
+            document.getElementById('fixNaptarValaszto').value = orvosId;
+            jobbNaptarFrissites();
             document.getElementById('udvozloKepernyo').classList.add('rejtett');
-            sessionStorage.setItem('udvozloLatva', 'igen'); // Megjegyzi a gép bezárásáig
+            sessionStorage.setItem('udvozloLatva', 'igen');
         }
+
 
         // FOGLALÁSI OLDAL LINKEK
         const orvos1Foglalolink = "https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ33_dOoB25zF0iL4Pc73e2WKdozTIp-WZdIsL0T24jynfX_FSKOBzlcbvMj4JdUkXRUE8IhHw-K";
@@ -344,7 +388,6 @@
                 selectElem.appendChild(option);
             });
             
-            jobbNaptarFrissites();
             setInterval(idoFrissites, 1000); idoFrissites();
         };
 
